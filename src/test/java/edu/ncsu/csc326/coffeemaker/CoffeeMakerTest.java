@@ -43,6 +43,10 @@ public class CoffeeMakerTest {
 	private Recipe recipe2;
 	private Recipe recipe3;
 	private Recipe recipe4;
+	private Recipe recipe5;
+	private Recipe recipe6;
+	private Recipe recipe7;
+	private Recipe recipe8;
 
 	/**
 	 * Initializes some recipes to test with and the {@link CoffeeMaker} 
@@ -90,6 +94,43 @@ public class CoffeeMakerTest {
 		recipe4.setAmtMilk("1");
 		recipe4.setAmtSugar("1");
 		recipe4.setPrice("65");
+
+		//Set up for r5
+		recipe5 = new Recipe();
+		recipe5.setName("Pure Chocolate");
+		recipe5.setAmtChocolate("50");
+		recipe5.setAmtCoffee("0");
+		recipe5.setAmtMilk("0");
+		recipe5.setAmtSugar("0");
+		recipe5.setPrice("1000");
+		
+		//Set up for r6
+		recipe6 = new Recipe();
+		recipe6.setName("Pure Coffee");
+		recipe6.setAmtChocolate("0");
+		recipe6.setAmtCoffee("50");
+		recipe6.setAmtMilk("0");
+		recipe6.setAmtSugar("0");
+		recipe6.setPrice("1000");
+		
+		//Set up for r7
+		recipe7 = new Recipe();
+		recipe7.setName("Pure Milk");
+		recipe7.setAmtChocolate("0");
+		recipe7.setAmtCoffee("0");
+		recipe7.setAmtMilk("50");
+		recipe7.setAmtSugar("0");
+		recipe7.setPrice("1000");
+		
+		//Set up for r8
+		recipe8 = new Recipe();
+		recipe8.setName("Pure Sugar");
+		recipe8.setAmtChocolate("0");
+		recipe8.setAmtCoffee("0");
+		recipe8.setAmtMilk("0");
+		recipe8.setAmtSugar("50");
+		recipe8.setPrice("1000");
+
 	}
 
 
@@ -275,5 +316,187 @@ public class CoffeeMakerTest {
 		coffeeMaker.addRecipe(recipe1);
 		coffeeMaker.addRecipe(recipe2);
 		assertEquals(100, coffeeMaker.makeCoffee(2, 100));
+	}
+
+	/**
+	 * There is a coffee recipe, then buy coffee until 
+	 * 		the ingrediant out of stock
+	 * Return the correct change back.
+	 */
+	@Test
+	public void testMakeCoffeeNotEnoughIngrediant() {
+		coffeeMaker.addRecipe(recipe4);
+		// the first three order still have enough ingrediant
+		assertEquals(0, coffeeMaker.makeCoffee(0, 65));
+		assertEquals(0, coffeeMaker.makeCoffee(0, 65));
+		assertEquals(0, coffeeMaker.makeCoffee(0, 65));
+		// the fourth do not have enough ingrediant
+		assertEquals(65, coffeeMaker.makeCoffee(0, 65));
+	}
+
+	/**
+	 * Add one recipe which exceed more than 
+	 * 		amount of chocolate in inventory
+	 * when customer buy the coffee, then
+	 * return the correct change. 
+	 */
+	@Test
+	public void testInventoryNotEnoughChocolate() {
+		coffeeMaker.addRecipe(recipe5);
+		assertEquals(1000, coffeeMaker.makeCoffee(0, 1000));
+	}
+
+	/**
+	 * Add one recipe which exceed more than 
+	 * 		amount of coffee in inventory
+	 * when customer buy the coffee, then
+	 * return the correct change. 
+	 */
+	@Test
+	public void testInventoryNotEnoughCoffee() {
+		coffeeMaker.addRecipe(recipe6);
+		assertEquals(1000, coffeeMaker.makeCoffee(0, 1000));
+	}
+
+	/**
+	 * Add one recipe which exceed more than 
+	 * 		amount of milk in inventory
+	 * when customer buy the coffee, then
+	 * return the correct change. 
+	 */
+	@Test
+	public void testInventoryNotEnoughMilk() {
+		coffeeMaker.addRecipe(recipe7);
+		assertEquals(1000, coffeeMaker.makeCoffee(0, 1000));
+	}
+
+	/**
+	 * Add one recipe which exceed more than 
+	 * 		amount of sugar in inventory
+	 * when customer buy the coffee, then
+	 * return the correct change. 
+	 */
+	@Test
+	public void testInventoryNotEnoughSugar() {
+		coffeeMaker.addRecipe(recipe8);
+		assertEquals(1000, coffeeMaker.makeCoffee(0, 1000));
+	}
+
+	/**
+	 * When add the chocolate to inventory which is not integer.
+	 * Throw the inventory exception
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddChocolateNotInteger() throws InventoryException {
+		coffeeMaker.addInventory("0", "0", "0", "abcd");
+	}
+
+	/**
+	 * When add the chocolate to inventory which is not positive integer.
+	 * Throw the inventory exception
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddChocolateNotPositiveInteger() throws InventoryException {
+		coffeeMaker.addInventory("0", "0", "0", "-15");
+	}
+
+	/**
+	 * When add the coffee to inventory which is not integer.
+	 * Throw the inventory exception
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddCoffeeNotInteger() throws InventoryException {
+		coffeeMaker.addInventory("abcd", "0", "0", "0");
+	}
+
+	/**
+	 * When add the coffee to inventory which is not positive integer.
+	 * Throw the inventory exception
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddCoffeeNotPositiveInteger() throws InventoryException {
+		coffeeMaker.addInventory("-15", "0", "0", "0");
+	}
+
+	/**
+	 * When add the milk to inventory which is not integer.
+	 * Throw the inventory exception
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddMilkNotInteger() throws InventoryException {
+		coffeeMaker.addInventory("0", "abcd", "0", "0");
+	}
+
+	/**
+	 * When add the milk to inventory which is not positive integer.
+	 * Throw the inventory exception
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddMilkNotPositiveInteger() throws InventoryException {
+		coffeeMaker.addInventory("0", "-15", "0", "0");
+	}
+
+	/**
+	 * When add the sugar to inventory which is not integer.
+	 * Throw the inventory exception
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddSugarNotInteger() throws InventoryException {
+		coffeeMaker.addInventory("0", "0", "abcd", "0");
+	}
+
+
+	/**
+	 * When add the sugar to inventory which is not positive integer.
+	 * Throw the inventory exception
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddSugarNotPositiveInteger() throws InventoryException {
+		coffeeMaker.addInventory("0", "0", "-15", "0");
+	}
+
+	/**
+	 * When add the sugar to inventory which is positive integer.
+	 * Should not throwed in the exception.
+	 * 
+	 * @throws InventoryException  if there was an error parsing the quanity
+	 * 		to a positive integer.
+	 * 
+	 */
+	@Test(expected = InventoryException.class)
+	public void testAddSugarPositiveInteger() throws InventoryException {
+		coffeeMaker.addInventory("0", "0", "15", "0");
 	}
 }
