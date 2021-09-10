@@ -26,6 +26,7 @@ import org.junit.Test;
 import edu.ncsu.csc326.coffeemaker.exceptions.InventoryException;
 import edu.ncsu.csc326.coffeemaker.exceptions.RecipeException;
 
+import static org.mockito.Mockito.*;
 /**
  * Unit tests for CoffeeMaker class.
  * 
@@ -37,6 +38,10 @@ public class CoffeeMakerTest {
 	 * The object under test.
 	 */
 	private CoffeeMaker coffeeMaker;
+	private RecipeBook recipeBook;
+	private Inventory inventory;
+	private CoffeeMaker mockCoffeeMaker;
+	private Recipe[] recipeList;
 	
 	// Sample recipes to use in testing.
 	private Recipe recipe1;
@@ -58,6 +63,9 @@ public class CoffeeMakerTest {
 	@Before
 	public void setUp() throws RecipeException {
 		coffeeMaker = new CoffeeMaker();
+		recipeBook = mock(RecipeBook.class);
+		inventory = new Inventory();
+		mockCoffeeMaker = new CoffeeMaker(recipeBook, inventory);
 		
 		//Set up for r1
 		recipe1 = new Recipe();
@@ -131,6 +139,7 @@ public class CoffeeMakerTest {
 		recipe8.setAmtSugar("50");
 		recipe8.setPrice("1000");
 
+		recipeList = new Recipe[] {recipe1, recipe2, recipe3, recipe4, recipe5, recipe6, recipe7, recipe8};
 	}
 
 
@@ -188,9 +197,8 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testDeleteExistedRecipe() {
-		coffeeMaker.addRecipe(recipe1);
-		coffeeMaker.addRecipe(recipe2);
-		assertEquals("Coffee", coffeeMaker.deleteRecipe(0));
+		when(mockCoffeeMaker.getRecipes()).thenReturn(recipeList);
+		assertEquals("Coffee", mockCoffeeMaker.deleteRecipe(0));
 	}
 
 	/**
@@ -200,9 +208,8 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testDeleteNotExistedRecipe() {
-		coffeeMaker.addRecipe(recipe1);
-		coffeeMaker.addRecipe(recipe2);
-		assertEquals(null, coffeeMaker.deleteRecipe(2));
+		when(mockCoffeeMaker.getRecipes()).thenReturn(recipeList);
+		assertEquals(null, mockCoffeeMaker.deleteRecipe(20));
 	}
 
 	/** 
@@ -263,10 +270,10 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testCheckInventory() {
-		coffeeMaker.addRecipe(recipe1);
-		coffeeMaker.makeCoffee(0, 50);
+		when(mockCoffeeMaker.getRecipes()).thenReturn(recipeList);
+		mockCoffeeMaker.makeCoffee(0, 50);
 		String expected_result = "Coffee: 12\nMilk: 14\nSugar: 14\nChocolate: 15\n";
-		assertEquals(expected_result, coffeeMaker.checkInventory());
+		assertEquals(expected_result, mockCoffeeMaker.checkInventory());
 	}
 
 	/**
@@ -276,9 +283,8 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testPurchaseBeverageEnoughMoney() {
-		coffeeMaker.addRecipe(recipe1);
-		assertEquals("Coffee", coffeeMaker.getRecipes()[0].getName());
-		assertEquals(100, coffeeMaker.makeCoffee(0, 150));
+		when(mockCoffeeMaker.getRecipes()).thenReturn(recipeList);
+		assertEquals(100, mockCoffeeMaker.makeCoffee(0, 150));
 	}
 
 	/**
@@ -288,9 +294,8 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testPurchaseBeverageNotHaveBeverage() {
-		coffeeMaker.addRecipe(recipe1);
-		assertEquals("Coffee", coffeeMaker.getRecipes()[0].getName());
-		assertEquals(30, coffeeMaker.makeCoffee(0, 30));
+		when(mockCoffeeMaker.getRecipes()).thenReturn(recipeList);
+		assertEquals(30, mockCoffeeMaker.makeCoffee(0, 30));
 	}
 
 	/**
@@ -300,9 +305,9 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testPurchaseBeverageNotEnoughMoney() {
-		coffeeMaker.addRecipe(recipe1);
-		assertEquals(null, coffeeMaker.editRecipe(1, recipe3));
-		assertEquals(100, coffeeMaker.makeCoffee(1, 100));
+		when(mockCoffeeMaker.getRecipes()).thenReturn(recipeList);
+		assertEquals(null, mockCoffeeMaker.editRecipe(1, recipe3));
+		assertEquals(100, mockCoffeeMaker.makeCoffee(1, 100));
 	}
 
 	/**
@@ -313,9 +318,8 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testMakeCoffeeOrderNotInRecipes() {
-		coffeeMaker.addRecipe(recipe1);
-		coffeeMaker.addRecipe(recipe2);
-		assertEquals(100, coffeeMaker.makeCoffee(2, 100));
+		when(mockCoffeeMaker.getRecipes()).thenReturn(recipeList);
+		assertEquals(100, mockCoffeeMaker.makeCoffee(5, 100));
 	}
 
 	/**
@@ -325,13 +329,13 @@ public class CoffeeMakerTest {
 	 */
 	@Test
 	public void testMakeCoffeeNotEnoughIngrediant() {
-		coffeeMaker.addRecipe(recipe4);
+		when(mockCoffeeMaker.getRecipes()).thenReturn(recipeList);
 		// the first three order still have enough ingrediant
-		assertEquals(0, coffeeMaker.makeCoffee(0, 65));
-		assertEquals(0, coffeeMaker.makeCoffee(0, 65));
-		assertEquals(0, coffeeMaker.makeCoffee(0, 65));
+		assertEquals(0, mockCoffeeMaker.makeCoffee(3, 65));
+		assertEquals(0, mockCoffeeMaker.makeCoffee(3, 65));
+		assertEquals(0, mockCoffeeMaker.makeCoffee(3, 65));
 		// the fourth do not have enough ingrediant
-		assertEquals(65, coffeeMaker.makeCoffee(0, 65));
+		assertEquals(65, mockCoffeeMaker.makeCoffee(3, 65));
 	}
 
 	/**
